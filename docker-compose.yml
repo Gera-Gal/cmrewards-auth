@@ -4,6 +4,12 @@ services:
   cmr-auth:
     build: .
     container_name: cmr-auth
-    ports:
-      - "8443:8443"
     restart: always
+    expose:
+      - "8443"
+    networks:
+      - proxy-network
+      
+networks:
+  proxy-network:
+    external: true
