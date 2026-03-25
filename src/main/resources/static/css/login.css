@@ -1,0 +1,353 @@
+/* ============================================
+   Cobro Móvil Rewards — Login Styles
+   ============================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Montserrat:wght@400;600;700;800&display=swap');
+
+/* ── Variables ── */
+:root {
+  --mint-light:   #d6f5ef;
+  --teal-mid:     #2abfaa;
+  --teal-dark:    #0e9e88;
+  --teal-deep:    #0a7c6a;
+  --blue-brand:   #1a6fb5;
+  --blue-dark:    #0d4a8a;
+  --yellow-star:  #f5c518;
+  --gold-star:    #e8a800;
+  --white:        #ffffff;
+  --input-border: #2abfaa;
+  --text-light:   #ffffff;
+  --text-muted:   rgba(255,255,255,0.85);
+  --shadow-card:  0 8px 32px rgba(10, 124, 106, 0.18);
+  --radius-input: 50px;
+  --radius-btn:   50px;
+}
+
+/* ── Reset & Base ── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  font-family: 'Nunito', sans-serif;
+}
+
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: linear-gradient(160deg, var(--mint-light) 0%, #b2ede3 100%);
+}
+
+/* ── Page wrapper ── */
+.login-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+/* ── Card ── */
+.login-card {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  border-radius: 36px;
+  overflow: hidden;
+  background: linear-gradient(
+    180deg,
+    var(--mint-light)  0%,
+    var(--mint-light) 38%,
+    var(--teal-mid)   56%,
+    var(--teal-dark)  72%,
+    var(--teal-deep)  100%
+  );
+  box-shadow: var(--shadow-card);
+  animation: cardEntrance 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes cardEntrance {
+  from { opacity: 0; transform: translateY(28px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0)    scale(1);    }
+}
+
+/* ── Hero Section (top half) ── */
+.hero-section {
+  position: relative;
+  padding: 36px 32px 0;
+  min-height: 340px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+/* ── Logo ── */
+.logo-area {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  animation: fadeDown 0.6s 0.15s both;
+}
+
+@keyframes fadeDown {
+  from { opacity: 0; transform: translateY(-16px); }
+  to   { opacity: 1; transform: translateY(0);     }
+}
+
+.logo-wordmark {
+  display: flex;
+  flex-direction: column;
+  line-height: 1;
+}
+
+.logo-cobro {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 2.6rem;
+  font-weight: 800;
+  color: var(--blue-brand);
+  letter-spacing: -1px;
+}
+
+.logo-movil {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 2.6rem;
+  font-weight: 900;
+  color: var(--blue-dark);
+  letter-spacing: -1px;
+  margin-top: -6px;
+}
+
+.logo-rewards {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 6px;
+  color: var(--teal-dark);
+  margin-top: 4px;
+}
+
+/* ── Piggy coin (top-right decoration) ── */
+.piggy-deco {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 3;
+  animation: floatBounce 3.5s ease-in-out infinite;
+}
+
+@keyframes floatBounce {
+  0%, 100% { transform: translateY(0) rotate(-4deg); }
+  50%       { transform: translateY(-8px) rotate(4deg); }
+}
+
+.piggy-circle {
+  width: 88px;
+  height: 88px;
+  background: radial-gradient(circle at 35% 35%, #4ac8f5, #1a6fb5 60%, #0d3d75);
+  border-radius: 50%;
+  position: relative;
+  box-shadow: 0 6px 20px rgba(10, 60, 120, 0.35);
+}
+
+.piggy-slot {
+  position: absolute;
+  top: 28%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 28px;
+  height: 5px;
+  background: #0a2a55;
+  border-radius: 3px;
+}
+
+.piggy-stars {
+  position: absolute;
+  top: -24px;
+  right: -10px;
+  display: flex;
+  gap: 4px;
+  align-items: flex-end;
+}
+
+.star-lg { font-size: 2.2rem; filter: drop-shadow(0 3px 6px rgba(0,0,0,0.2)); }
+.star-sm { font-size: 1.2rem; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15)); }
+.star-xs { font-size: 0.9rem; }
+
+/* ── Star shape background ── */
+.star-shape {
+  position: absolute;
+  bottom: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 260px;
+  height: 260px;
+  z-index: 1;
+}
+
+.star-shape svg {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 6px 18px rgba(200, 130, 0, 0.25));
+}
+
+/* ── Hero image (person) ── */
+.hero-image-wrap {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 240px;
+  z-index: 2;
+  animation: heroRise 0.8s 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes heroRise {
+  from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0);    }
+}
+
+.hero-image-wrap img {
+  width: 100%;
+  display: block;
+  object-fit: contain;
+}
+
+/* ── Wave divider ── */
+.wave-divider {
+  display: block;
+  width: 100%;
+  margin-top: -2px;
+  line-height: 0;
+}
+
+/* ── Form Section (bottom half) ── */
+.form-section {
+  background: linear-gradient(180deg, var(--teal-mid) 0%, var(--teal-deep) 100%);
+  padding: 28px 28px 36px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  animation: fadeUp 0.6s 0.4s both;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+/* ── Error alert ── */
+.alert-error {
+  background: rgba(255, 80, 80, 0.18);
+  border: 1px solid rgba(255, 120, 120, 0.5);
+  border-radius: 14px;
+  padding: 10px 16px;
+  color: #ffe0e0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+/* ── Input wrapper ── */
+.input-wrap {
+  position: relative;
+}
+
+.input-wrap input {
+  width: 100%;
+  padding: 15px 22px;
+  border-radius: var(--radius-input);
+  border: 2px solid transparent;
+  background: var(--white);
+  font-family: 'Nunito', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--teal-dark);
+  outline: none;
+  transition: border-color 0.25s, box-shadow 0.25s;
+}
+
+.input-wrap input::placeholder {
+  color: var(--teal-mid);
+  font-weight: 600;
+}
+
+.input-wrap input:focus {
+  border-color: var(--blue-brand);
+  box-shadow: 0 0 0 4px rgba(26, 111, 181, 0.15);
+}
+
+/* ── Submit button ── */
+.btn-login {
+  width: 100%;
+  padding: 16px;
+  border-radius: var(--radius-btn);
+  border: none;
+  cursor: pointer;
+  font-family: 'Nunito', sans-serif;
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  color: var(--white);
+  background: linear-gradient(135deg, #2283d6 0%, #1a6fb5 50%, #1259a0 100%);
+  box-shadow: 0 6px 20px rgba(13, 74, 138, 0.4), inset 0 1px 0 rgba(255,255,255,0.2);
+  transition: transform 0.18s, box-shadow 0.18s, filter 0.18s;
+  margin-top: 4px;
+}
+
+.btn-login:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(13, 74, 138, 0.5), inset 0 1px 0 rgba(255,255,255,0.25);
+  filter: brightness(1.08);
+}
+
+.btn-login:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 12px rgba(13, 74, 138, 0.35);
+}
+
+/* ── Footer links ── */
+.form-links {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.form-links a,
+.form-links p {
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  text-decoration: none;
+  text-align: center;
+  transition: color 0.2s;
+}
+
+.form-links a:hover { color: var(--white); }
+
+.form-links .link-register {
+  font-weight: 700;
+  color: var(--white);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.form-links .link-register:hover { color: var(--yellow-star); }
+
+/* ── Responsive ── */
+@media (max-width: 440px) {
+  .login-card       { border-radius: 0; min-height: 100vh; max-width: 100%; }
+  .login-page       { padding: 0; }
+  .logo-cobro,
+  .logo-movil       { font-size: 2.2rem; }
+  .hero-image-wrap  { width: 200px; }
+  .star-shape       { width: 220px; height: 220px; }
+}

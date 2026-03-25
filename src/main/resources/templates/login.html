@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cobro Móvil Rewards — Iniciar sesión</title>
+
+  <!-- CSS externo -->
+  <link rel="stylesheet" th:href="@{/css/login.css}" />
+
+  <!-- Favicon (opcional) -->
+  <!-- <link rel="icon" th:href="@{/images/favicon.ico}" type="image/x-icon" /> -->
+</head>
+<body>
+
+<div class="login-page">
+  <div class="login-card">
+
+    <!-- ══════════════════════════════
+         HERO — Zona superior (mint)
+    ═══════════════════════════════ -->
+    <div class="hero-section">
+
+      <!-- Logo textual -->
+      <div class="logo-area">
+        <div class="logo-wordmark">
+          <span class="logo-cobro">Cobro</span>
+          <span class="logo-movil">Móvil</span>
+        </div>
+        <span class="logo-rewards">R E W A R D S</span>
+      </div>
+
+      <!-- Alcancía decorativa (top-right) -->
+      <div class="piggy-deco" aria-hidden="true">
+        <div class="piggy-stars">
+          <span class="star-lg">⭐</span>
+          <span class="star-sm">⭐</span>
+          <span class="star-xs">✨</span>
+        </div>
+        <div class="piggy-circle">
+          <div class="piggy-slot"></div>
+        </div>
+      </div>
+
+      <!-- Estrella amarilla de fondo (SVG inline para no depender de imagen) -->
+      <div class="star-shape" aria-hidden="true">
+        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+          <polygon
+            points="100,5 125,75 195,75 140,118 160,190 100,148 40,190 60,118 5,75 75,75"
+            fill="#F5C518"
+          />
+        </svg>
+      </div>
+
+      <!-- Imagen de persona celebrando -->
+      <!--
+        Coloca tu imagen en: src/main/resources/static/images/hero-person.png
+        Thymeleaf resolverá la ruta con th:src="@{/images/hero-person.png}"
+      -->
+      <div class="hero-image-wrap">
+        <img
+          th:src="@{/images/hero-person.png}"
+          src="https://placehold.co/240x340/transparent/transparent?text="
+          alt="Persona celebrando sus recompensas"
+        />
+      </div>
+
+    </div><!-- /hero-section -->
+
+    <!-- ══════════════════════════════
+         FORMULARIO — Zona inferior (teal)
+    ═══════════════════════════════ -->
+    <div class="form-section">
+
+      <!--
+        Spring Security espera POST a /login por defecto.
+        th:action="@{/login}" genera la URL correcta según el context-path.
+        th:object NO se usa en login; los campos se envían como parámetros planos.
+      -->
+      <form th:action="@{/login}" method="post" autocomplete="off" novalidate>
+
+        <!--
+          Bloque de error:
+          Spring Security redirige a /login?error cuando las credenciales fallan.
+          El parámetro "error" queda disponible en el modelo como param.error.
+        -->
+        <div class="alert-error"
+             th:if="${param.error}"
+             role="alert"
+             aria-live="assertive">
+          Correo o contraseña incorrectos. Por favor intenta de nuevo.
+        </div>
+
+        <!--
+          Mensaje de logout (opcional):
+          Spring Security redirige a /login?logout tras cerrar sesión.
+        -->
+        <div class="alert-error"
+             th:if="${param.logout}"
+             style="background: rgba(42,191,170,0.18); border-color: rgba(42,191,170,0.5); color: #e0fff9;"
+             role="status"
+             aria-live="polite">
+          Has cerrado sesión correctamente.
+        </div>
+
+        <!-- Campo: Correo electrónico -->
+        <div class="input-wrap">
+          <input
+            type="email"
+            id="username"
+            name="username"
+            placeholder="Correo Electrónico"
+            autocomplete="email"
+            required
+            aria-label="Correo electrónico"
+          />
+        </div>
+
+        <!-- Campo: Contraseña -->
+        <div class="input-wrap">
+          <input
+            type="password"
+            id="password"
+            name="password"
+            placeholder="Contraseña"
+            autocomplete="current-password"
+            required
+            aria-label="Contraseña"
+          />
+        </div>
+
+        <!-- Botón de envío -->
+        <button type="submit" class="btn-login">
+          Iniciar sesión
+        </button>
+
+        <!-- Links secundarios -->
+        <!-- 
+        <div class="form-links">
+          <a th:href="@{/forgot-password}">¿Olvidaste tu contraseña?</a>
+          <p>
+            ¿No tienes cuenta?
+            <a th:href="@{/register}" class="link-register">Regístrate aquí</a>
+          </p>
+        </div>
+         -->
+
+      </form>
+    </div><!-- /form-section -->
+
+  </div><!-- /login-card -->
+</div><!-- /login-page -->
+
+</body>
+</html>
