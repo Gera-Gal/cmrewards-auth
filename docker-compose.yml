@@ -6,7 +6,7 @@ services:
     container_name: cmr-auth
     restart: always
     expose:
-      - "8443"
+      - "5505"
     networks:
       - proxy-network
       

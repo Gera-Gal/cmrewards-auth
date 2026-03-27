@@ -1,0 +1,50 @@
+2026-03-27T14:15:51.331-06:00  INFO 15676 --- [restaurantesAuthServer] [main] r.RestaurantesAuthServerApplicationTests : Starting RestaurantesAuthServerApplicationTests using Java 17 with PID 15676 (started by gavg in C:\Users\gavg\rewards-workspace\restaurantesauthserver-Function\restaurantesauthserver-Function)
+2026-03-27T14:15:51.356-06:00  INFO 15676 --- [restaurantesAuthServer] [main] r.RestaurantesAuthServerApplicationTests : No active profile set, falling back to 1 default profile: "default"
+2026-03-27T14:15:51.455-06:00 TRACE 15676 --- [restaurantesAuthServer] [main] o.s.w.c.s.GenericWebApplicationContext   : Refreshing org.springframework.web.context.support.GenericWebApplicationContext@518cf84a, started on Fri Mar 27 14:15:51 CST 2026
+2026-03-27T14:15:52.954-06:00  INFO 15676 --- [restaurantesAuthServer] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-03-27T14:15:53.114-06:00  INFO 15676 --- [restaurantesAuthServer] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 138 ms. Found 2 JPA repository interfaces.
+2026-03-27T14:15:53.933-06:00 TRACE 15676 --- [restaurantesAuthServer] [main] o.s.w.c.s.GenericWebApplicationContext   : No 'messageSource' bean, using [Empty MessageSource]
+2026-03-27T14:15:53.934-06:00 TRACE 15676 --- [restaurantesAuthServer] [main] o.s.w.c.s.GenericWebApplicationContext   : No 'applicationEventMulticaster' bean, using [SimpleApplicationEventMulticaster]
+2026-03-27T14:15:54.186-06:00  INFO 15676 --- [restaurantesAuthServer] [main] c.z.h.HikariDataSource                   : HikariPool-SQLServer - Starting...
+2026-03-27T14:15:55.328-06:00  INFO 15676 --- [restaurantesAuthServer] [main] c.z.h.p.HikariPool                       : HikariPool-SQLServer - Added connection ConnectionID:1 ClientConnectionId: 0155ba8d-aaba-4258-b46a-89477b53cb4a
+2026-03-27T14:15:55.334-06:00  INFO 15676 --- [restaurantesAuthServer] [main] c.z.h.HikariDataSource                   : HikariPool-SQLServer - Start completed.
+2026-03-27T14:15:55.570-06:00  INFO 15676 --- [restaurantesAuthServer] [main] o.h.j.i.u.LogHelper                      : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-03-27T14:15:55.734-06:00  INFO 15676 --- [restaurantesAuthServer] [main] o.h.Version                              : HHH000412: Hibernate ORM core version 6.6.29.Final
+2026-03-27T14:15:55.838-06:00  INFO 15676 --- [restaurantesAuthServer] [main] o.h.c.i.RegionFactoryInitiator           : HHH000026: Second-level cache disabled
+2026-03-27T14:15:56.662-06:00  INFO 15676 --- [restaurantesAuthServer] [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-03-27T14:15:57.233-06:00  INFO 15676 --- [restaurantesAuthServer] [main] o.h.o.c.pooling                          : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-SQLServer)']
+	Database driver: undefined/unknown
+	Database version: 16.0
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-03-27T14:15:58.834-06:00  INFO 15676 --- [restaurantesAuthServer] [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-03-27T14:15:58.842-06:00  INFO 15676 --- [restaurantesAuthServer] [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-03-27T14:15:59.705-06:00  WARN 15676 --- [restaurantesAuthServer] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-03-27T14:15:59.732-06:00 TRACE 15676 --- [restaurantesAuthServer] [main] eGlobalAuthenticationAutowiredConfigurer : Eagerly initializing {securityServerConfig=com.praxis.authentication.configuration.SecurityServerConfig$$SpringCGLIB$$0@5fb0a09e}
+2026-03-27T14:15:59.739-06:00  WARN 15676 --- [restaurantesAuthServer] [main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
+2026-03-27T14:16:00.081-06:00 TRACE 15676 --- [restaurantesAuthServer] [main] s.w.s.m.m.a.RequestMappingHandlerMapping : 
+	c.p.a.c.LoginController:
+	{GET [/login]}: login()
+2026-03-27T14:16:00.097-06:00 TRACE 15676 --- [restaurantesAuthServer] [main] s.w.s.m.m.a.RequestMappingHandlerMapping : 
+	o.s.b.a.w.s.e.BasicErrorController:
+	{ [/error]}: error(HttpServletRequest)
+	{ [/error], produces [text/html]}: errorHtml(HttpServletRequest,HttpServletResponse)
+2026-03-27T14:16:00.103-06:00 DEBUG 15676 --- [restaurantesAuthServer] [main] s.w.s.m.m.a.RequestMappingHandlerMapping : 3 mappings in 'requestMappingHandlerMapping'
+2026-03-27T14:16:00.114-06:00 DEBUG 15676 --- [restaurantesAuthServer] [main] o.s.w.s.h.BeanNameUrlHandlerMapping      : Detected 0 mappings in 'beanNameHandlerMapping'
+2026-03-27T14:16:00.382-06:00 TRACE 15676 --- [restaurantesAuthServer] [main] o.s.w.s.f.s.RouterFunctionMapping        : 0 RouterFunction(s) in 'routerFunctionMapping'
+2026-03-27T14:16:00.424-06:00 TRACE 15676 --- [restaurantesAuthServer] [main] o.s.w.s.h.SimpleUrlHandlerMapping        : Mapped [/webjars/**] onto ResourceHttpRequestHandler [classpath [META-INF/resources/webjars/]]
+2026-03-27T14:16:00.426-06:00 TRACE 15676 --- [restaurantesAuthServer] [main] o.s.w.s.h.SimpleUrlHandlerMapping        : Mapped [/**] onto ResourceHttpRequestHandler [classpath [META-INF/resources/], classpath [resources/], classpath [static/], classpath [public/], ServletContext [/]]
+2026-03-27T14:16:00.427-06:00 DEBUG 15676 --- [restaurantesAuthServer] [main] o.s.w.s.h.SimpleUrlHandlerMapping        : Patterns [/webjars/**, /**] in 'resourceHandlerMapping'
+2026-03-27T14:16:01.329-06:00 DEBUG 15676 --- [restaurantesAuthServer] [main] o.s.s.w.DefaultSecurityFilterChain       : Will secure org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer$$Lambda$1651/0x00000008015797d8@4e7e7763 with filters: DisableEncodeUrlFilter, WebAsyncManagerIntegrationFilter, SecurityContextHolderFilter, AuthorizationServerContextFilter, HeaderWriterFilter, CsrfFilter, OidcLogoutEndpointFilter, LogoutFilter, OAuth2AuthorizationServerMetadataEndpointFilter, OAuth2AuthorizationEndpointFilter, OAuth2DeviceVerificationEndpointFilter, OidcProviderConfigurationEndpointFilter, NimbusJwkSetEndpointFilter, OAuth2ClientAuthenticationFilter, BearerTokenAuthenticationFilter, RequestCacheAwareFilter, SecurityContextHolderAwareRequestFilter, AnonymousAuthenticationFilter, ExceptionTranslationFilter, AuthorizationFilter, OAuth2TokenEndpointFilter, OAuth2TokenIntrospectionEndpointFilter, OAuth2TokenRevocationEndpointFilter, OAuth2DeviceAuthorizationEndpointFilter, OidcUserInfoEndpointFilter
+2026-03-27T14:16:01.369-06:00 DEBUG 15676 --- [restaurantesAuthServer] [main] o.s.s.w.DefaultSecurityFilterChain       : Will secure any request with filters: DisableEncodeUrlFilter, WebAsyncManagerIntegrationFilter, SecurityContextHolderFilter, HeaderWriterFilter, LogoutFilter, UsernamePasswordAuthenticationFilter, RequestCacheAwareFilter, SecurityContextHolderAwareRequestFilter, AnonymousAuthenticationFilter, ExceptionTranslationFilter, AuthorizationFilter
+2026-03-27T14:16:01.854-06:00 DEBUG 15676 --- [restaurantesAuthServer] [main] s.w.s.m.m.a.RequestMappingHandlerAdapter : ControllerAdvice beans: 0 @ModelAttribute, 0 @InitBinder, 1 RequestBodyAdvice, 1 ResponseBodyAdvice
+2026-03-27T14:16:02.047-06:00 DEBUG 15676 --- [restaurantesAuthServer] [main] .m.m.a.ExceptionHandlerExceptionResolver : ControllerAdvice beans: 0 @ExceptionHandler, 1 ResponseBodyAdvice
+2026-03-27T14:16:02.329-06:00 TRACE 15676 --- [restaurantesAuthServer] [main] o.s.w.c.s.GenericWebApplicationContext   : Using LifecycleProcessor [org.springframework.context.support.DefaultLifecycleProcessor@6d398b6c]
+2026-03-27T14:16:02.353-06:00  INFO 15676 --- [restaurantesAuthServer] [main] r.RestaurantesAuthServerApplicationTests : Started RestaurantesAuthServerApplicationTests in 11.727 seconds (process running for 14.328)
+2026-03-27T14:16:03.494-06:00 DEBUG 15676 --- [restaurantesAuthServer] [SpringApplicationShutdownHook] o.s.w.c.s.GenericWebApplicationContext   : Closing org.springframework.web.context.support.GenericWebApplicationContext@518cf84a, started on Fri Mar 27 14:15:51 CST 2026
+2026-03-27T14:16:03.503-06:00  INFO 15676 --- [restaurantesAuthServer] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-03-27T14:16:03.507-06:00  INFO 15676 --- [restaurantesAuthServer] [SpringApplicationShutdownHook] c.z.h.HikariDataSource                   : HikariPool-SQLServer - Shutdown initiated...
+2026-03-27T14:16:03.515-06:00  INFO 15676 --- [restaurantesAuthServer] [SpringApplicationShutdownHook] c.z.h.HikariDataSource                   : HikariPool-SQLServer - Shutdown completed.
