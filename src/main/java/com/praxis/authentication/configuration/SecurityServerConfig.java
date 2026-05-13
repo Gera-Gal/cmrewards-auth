@@ -1,5 +1,6 @@
 package com.praxis.authentication.configuration;
 
+import java.io.IOException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.interfaces.RSAPrivateKey;
@@ -17,10 +18,15 @@ import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 import com.praxis.authentication.business.security.CustomPasswordEncoder;
+import com.praxis.authentication.business.security.MultiTenantUserDetailsService;
 import com.praxis.authentication.business.security.UserDetailsImpl;
 import com.praxis.authentication.business.security.UserDetailsServiceImpl;
 
+import jakarta.annotation.PostConstruct;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,9 +42,11 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.keygen.Base64StringKeyGenerator;
 import org.springframework.security.crypto.keygen.StringKeyGenerator;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
@@ -67,10 +75,15 @@ import org.springframework.security.oauth2.server.authorization.token.JwtGenerat
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenContext;
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenCustomizer;
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenGenerator;
+import org.springframework.security.oauth2.server.authorization.web.OAuth2ClientAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
+import org.springframework.security.web.session.DisableEncodeUrlFilter;
 import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
 import org.springframework.util.StringUtils;
+import org.springframework.web.filter.ForwardedHeaderFilter;
 import org.springframework.security.web.authentication.AuthenticationConverter;
 
 @Configuration
@@ -83,20 +96,37 @@ public class SecurityServerConfig {
 	private Environment environment;
 	
 	@Autowired
-    private UserDetailsServiceImpl userDetailsService;
+	private TenantFilter tenantFilter;
+	
+	@Autowired
+	private RequestLoggingFilter requestLoggingFilter;
+	
+	@Autowired
+    private MultiTenantUserDetailsService multiTenantUserDetailsService;
 	
 	@Autowired
     private CustomPasswordEncoder passwordEncoder;
 	
+	
 	@Autowired
     public void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userDetailsService)
+        auth.userDetailsService(multiTenantUserDetailsService)
         	.passwordEncoder(passwordEncoder); // Configure a password encoder
     }
 	
 	@Bean
 	@Order(1)
 	public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http, RegisteredClientRepository registeredClientRepository) throws Exception {
+		
+		// Configuración de sesión - FORZAR cookies
+	    http.sessionManagement(session -> session
+	        .sessionFixation().migrateSession()
+	        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+	    );
+	    
+	    http.addFilterBefore(requestLoggingFilter, DisableEncodeUrlFilter.class);
+	    
+		http.addFilterBefore(tenantFilter, DisableEncodeUrlFilter.class);
 		
 		OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
 		http.getConfigurer(OAuth2AuthorizationServerConfigurer.class)
@@ -105,7 +135,11 @@ public class SecurityServerConfig {
 				authentication.authenticationProvider(new PublicClientRefreshProvider(registeredClientRepository));
 			})
 			.tokenGenerator(tokenGenerator())
-			.oidc(Customizer.withDefaults());
+			.oidc(oidc -> oidc
+				.logoutEndpoint(logout -> logout
+					.logoutResponseHandler((request, response, authentication) -> {
+						handleOidcLogout(request, response, authentication);
+					})));
 
 		http.exceptionHandling((exceptions) -> exceptions
 			.defaultAuthenticationEntryPointFor(
@@ -117,6 +151,58 @@ public class SecurityServerConfig {
 				.jwt(Customizer.withDefaults()));
 
 		return http.build();
+	}
+	
+	private void handleOidcLogout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
+
+	    log.info("🚪 LOGOUT - Iniciando proceso de cierre de sesión");
+	    log.info("   Request URI: {}", request.getRequestURI());
+	    log.info("   Authentication presente: {}", authentication != null);
+
+	    // 1. Invalidar sesión HTTP
+	    HttpSession session = request.getSession(false);
+	    if (session != null) {
+	        log.info("   Invalidando sesión HTTP: {}", session.getId());
+	        session.invalidate();
+	    } else {
+	        log.info("   No hay sesión HTTP activa");
+	    }
+
+	    // 2. Limpiar cookies de sesión
+	    Cookie jsessionCookie = new Cookie("JSESSIONID", null);
+	    jsessionCookie.setPath("/");
+	    jsessionCookie.setHttpOnly(true);
+	    jsessionCookie.setMaxAge(0);
+	    response.addCookie(jsessionCookie);
+	    log.info("   Cookie JSESSIONID eliminada");
+
+	    // 3. Limpiar contexto de seguridad
+	    SecurityContextHolder.clearContext();
+	    log.info("   SecurityContext limpiado");
+
+	    // 4. Si hay autenticación, hacer logout también
+	    if (authentication != null) {
+	        log.info("   Limpiando autenticación para usuario: {}", authentication.getName());
+	        new SecurityContextLogoutHandler().logout(request, response, authentication);
+	    }
+
+	    // 5. Obtener parámetros
+	    String postLogoutRedirectUri = request.getParameter("post_logout_redirect_uri");
+	    String clientId = request.getParameter("client_id");
+	    String idTokenHint = request.getParameter("id_token_hint");
+
+	    log.info("   Parámetros - post_logout_redirect_uri: {}", postLogoutRedirectUri);
+	    log.info("   Parámetros - client_id: {}", clientId);
+	    log.info("   Parámetros - id_token_hint: {}", idTokenHint != null ? "presente" : "ausente");
+
+	    // 6. Redirigir
+	    if (postLogoutRedirectUri != null && !postLogoutRedirectUri.isEmpty()) {
+	        log.info("➡️ Redirigiendo a post_logout_redirect_uri: {}", postLogoutRedirectUri);
+	        response.sendRedirect(postLogoutRedirectUri);
+	    } else {
+	        log.info("➡️ No hay post_logout_redirect_uri, redirigiendo a /login?logout");
+	        response.sendRedirect("/login?logout");
+	    }
 	}
 
 	@Bean
@@ -147,38 +233,61 @@ public class SecurityServerConfig {
 	public RegisteredClientRepository registeredClientRepository() {		
 		
 		RegisteredClient oidcClient = RegisteredClient.withId(UUID.randomUUID().toString())
-			.clientId(environment.getRequiredProperty("spring.authorizationserver.client-id"))			//coincidir
-			.clientAuthenticationMethod(ClientAuthenticationMethod.NONE)
-			.authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-			.authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
-			.redirectUri(environment.getRequiredProperty("spring.authorizationserver.redirect-uri"))	//aplicacion cliente, coincidir
-			.redirectUri(environment.getRequiredProperty("spring.authorizationserver.redirect-uri-aut"))
-			.postLogoutRedirectUri(environment.getRequiredProperty("spring.authorizationserver.logout-uri"))//aplicacion cliente
-			.scope("read")
-			.scope("write")
-			.scope(OidcScopes.OPENID)
-			.scope(OidcScopes.PROFILE)
-			.tokenSettings(TokenSettings.builder()
-	                .accessTokenTimeToLive(Duration.ofMinutes(15))
-	                .refreshTokenTimeToLive(Duration.ofHours(2))
-	                //.reuseRefreshTokens(false)
-	                .build())
-			.clientSettings(ClientSettings.builder()
-				.requireAuthorizationConsent(false)
-				.requireProofKey(true)				
-				.build())			
-			.build();
-		
-		RegisteredClient clientCmpay = RegisteredClient.withId(UUID.randomUUID().toString())
-				.clientId(environment.getRequiredProperty("spring.authorizationserver.client-idCmpay"))			//coincidir
-				.clientSecret(environment.getRequiredProperty("spring.authorizationserver.client-secretCmpay"))
-				.clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
-				.authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
-				.scope("read")																				
+				.clientId(environment.getRequiredProperty("spring.authorizationserver.client-id"))			//coincidir
+				.clientAuthenticationMethod(ClientAuthenticationMethod.NONE)
+				.authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+				.authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
+				.redirectUri(environment.getRequiredProperty("spring.authorizationserver.redirect-uri"))	//aplicacion cliente, coincidir
+				.redirectUri(environment.getRequiredProperty("spring.authorizationserver.redirect-uri-aut"))
+				.postLogoutRedirectUri(environment.getRequiredProperty("spring.authorizationserver.logout-uri"))//aplicacion cliente
+				.scope("read")
 				.scope("write")
+				.scope(OidcScopes.OPENID)
+				.scope(OidcScopes.PROFILE)
+				.tokenSettings(TokenSettings.builder()
+		                .accessTokenTimeToLive(Duration.ofMinutes(15))
+		                .refreshTokenTimeToLive(Duration.ofHours(2))
+		                //.reuseRefreshTokens(false)
+		                .build())
+				.clientSettings(ClientSettings.builder()
+					.requireAuthorizationConsent(false)
+					.requireProofKey(true)				
+					.build())			
 				.build();
-		
-		return new InMemoryRegisteredClientRepository(oidcClient, clientCmpay);
+			
+			RegisteredClient oidcAdminClient = RegisteredClient.withId(UUID.randomUUID().toString())
+					.clientId(environment.getRequiredProperty("spring.authorizationserver.client-idAdmin"))			//coincidir
+					.clientAuthenticationMethod(ClientAuthenticationMethod.NONE)
+					.authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+					.authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
+					.redirectUri(environment.getRequiredProperty("spring.authorizationserver.redirect-uri"))	//aplicacion cliente, coincidir
+					.redirectUri(environment.getRequiredProperty("spring.authorizationserver.redirect-uri-aut"))
+					.postLogoutRedirectUri(environment.getRequiredProperty("spring.authorizationserver.logout-uri"))//aplicacion cliente
+					.scope("read")
+					.scope("write")
+					.scope(OidcScopes.OPENID)
+					.scope(OidcScopes.PROFILE)
+					.tokenSettings(TokenSettings.builder()
+			                .accessTokenTimeToLive(Duration.ofMinutes(15))
+			                .refreshTokenTimeToLive(Duration.ofHours(2))
+			                //.reuseRefreshTokens(false)
+			                .build())
+					.clientSettings(ClientSettings.builder()
+						.requireAuthorizationConsent(false)
+						.requireProofKey(true)				
+						.build())			
+					.build();
+			
+			RegisteredClient clientCmpay = RegisteredClient.withId(UUID.randomUUID().toString())
+					.clientId(environment.getRequiredProperty("spring.authorizationserver.client-idCmpay"))			//coincidir
+					.clientSecret(environment.getRequiredProperty("spring.authorizationserver.client-secretCmpay"))
+					.clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
+					.authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
+					.scope("read")																				
+					.scope("write")
+					.build();
+			
+			return new InMemoryRegisteredClientRepository(oidcClient, oidcAdminClient, clientCmpay);
 	}
 	
 	@Bean
@@ -217,37 +326,50 @@ public class SecurityServerConfig {
 		return AuthorizationServerSettings.builder().build();
 	}
 	
+	@Bean
+	public ForwardedHeaderFilter forwardedHeaderFilter() {
+	    return new ForwardedHeaderFilter();
+	}
+	
 	OAuth2TokenCustomizer<JwtEncodingContext> customizer(){
-		return context -> {
-			log.info("Generando token de acceso...");
-			//if(context.getTokenType().getValue().equals(OidcParameterNames.ID_TOKEN)) {
-			if(context.getTokenType().getValue().equals("access_token") 
-				&& !context.getAuthorizationGrantType().equals(AuthorizationGrantType.CLIENT_CREDENTIALS)) {
-				Authentication principle = context.getPrincipal();
-				
-				log.info("Obteniendo UserId");
-				
-				UserDetailsImpl userDetail = (UserDetailsImpl) context.getPrincipal().getPrincipal();				
-                context.getClaims().claim("user_id", userDetail.getUserId());
-                context.getClaims().claim("email", userDetail.getEmail());
-                
-                if (OAuth2TokenType.ACCESS_TOKEN.equals(context.getTokenType())) {
-	                // Extraer roles de las autoridades
+	    return context -> {
+	        log.info("🔐 Generando token de acceso...");
+	        log.info("   Grant type: {}", context.getAuthorizationGrantType());
+	        log.info("   Token type: {}", context.getTokenType());
+	        
+	        if(context.getTokenType().getValue().equals("access_token") 
+	            && !context.getAuthorizationGrantType().equals(AuthorizationGrantType.CLIENT_CREDENTIALS)) {
+	            
+	            Authentication principle = context.getPrincipal();
+	            log.info("   Principal class: {}", principle.getClass().getSimpleName());
+	            
+	            UserDetailsImpl userDetail = (UserDetailsImpl) context.getPrincipal().getPrincipal();
+	            
+	            log.info("   UserId: {}", userDetail.getUserId());
+	            log.info("   Email: {}", userDetail.getEmail());
+	            
+	            context.getClaims().claim("user_id", userDetail.getUserId());
+	            context.getClaims().claim("email", userDetail.getEmail());
+	            
+	            if (OAuth2TokenType.ACCESS_TOKEN.equals(context.getTokenType())) {
 	                Set<String> roles = new HashSet<>();
 	                
 	                for (GrantedAuthority authority : principle.getAuthorities()) {
 	                    String role = authority.getAuthority();
 	                    if (role.startsWith("ROLE_")) {
-	                        role = role.substring(5); // Quitar "ROLE_"
+	                        role = role.substring(5);
 	                    }
 	                    roles.add(role);
 	                }
+	                log.info("   Roles a incluir en JWT: {}", roles);
 	                context.getClaims().claim("roles", roles);
 	            }
-                
-                log.info("UserId Obtenido:"+ userDetail.getUserId());
-			}
-		};
+	            
+	            log.info("✅ Token generado exitosamente para userId: {}", userDetail.getUserId());
+	        } else if (context.getAuthorizationGrantType().equals(AuthorizationGrantType.CLIENT_CREDENTIALS)) {
+	            log.info("   Token para CLIENT_CREDENTIALS - no se añaden claims de usuario");
+	        }
+	    };
 	}
 	
 	@Bean
@@ -346,6 +468,20 @@ public class SecurityServerConfig {
 			return PublicClientRefreshTokenAuthentication.class.isAssignableFrom(authentication);
 		}
 		
+	}
+	
+	@PostConstruct
+	public void logRegisteredClients() {
+	    log.info("========================================");
+	    log.info("📋 CLIENTES REGISTRADOS EN EL SERVIDOR:");
+	    log.info("========================================");
+	    log.info("1. Client ID: {} - Grant types: AUTHORIZATION_CODE, REFRESH_TOKEN", 
+	        environment.getRequiredProperty("spring.authorizationserver.client-id"));
+	    log.info("2. Client ID: {} - Grant types: AUTHORIZATION_CODE, REFRESH_TOKEN", 
+	        environment.getRequiredProperty("spring.authorizationserver.client-idAdmin"));
+	    log.info("3. Client ID: {} - Grant type: CLIENT_CREDENTIALS", 
+	        environment.getRequiredProperty("spring.authorizationserver.client-idCmpay"));
+	    log.info("========================================");
 	}
 
 }

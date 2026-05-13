@@ -1,4 +1,4 @@
-package com.praxis.authentication.data.entity;
+package com.praxis.authentication.data.entity.sqlserver;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
