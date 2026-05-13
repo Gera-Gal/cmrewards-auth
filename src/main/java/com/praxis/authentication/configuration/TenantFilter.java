@@ -18,79 +18,83 @@ import jakarta.servlet.http.HttpSession;
 public class TenantFilter extends OncePerRequestFilter {
     
     private static final Logger log = LoggerFactory.getLogger(TenantFilter.class);
-
+    
     private final ClientTenantService clientTenantService;
-
+    
     public TenantFilter(ClientTenantService clientTenantService) {
         this.clientTenantService = clientTenantService;
     }
-
+    
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain)
             throws ServletException, IOException {
-
-        try {
-            String clientId = extractClientId(request);
+        
+        String clientId = extractClientId(request);
+        log.info("🔍 [TenantFilter] Procesando {} {} - ClientId: {}", 
+            request.getMethod(), request.getRequestURI(), clientId);
+        
+        // ALWAYS establecer tenant basado en clientId si está disponible
+        if (clientId != null) {
+            String tenant = clientTenantService.resolveTenant(clientId);
+            log.info("🏢 [TenantFilter] Tenant resuelto: {} para clientId: {}", tenant, clientId);
             
-            log.info("🔍 [TenantFilter] Procesando {} {}", request.getMethod(), request.getRequestURI());
-            log.info("🔍 [TenantFilter] Client ID extraído: {}", clientId);
-
-            if (clientId != null) {
-                String tenant = clientTenantService.resolveTenant(clientId);
-                log.info("🏢 [TenantFilter] Tenant resuelto: {} para clientId: {}", tenant, clientId);
-
-                // Guardar en ThreadLocal para el request actual
-                TenantContext.setTenant(tenant);
-                TenantContext.setClientId(clientId);
-                
-                // ✅ GUARDAR EN SESIÓN para peticiones posteriores
-                HttpSession session = request.getSession(true);
-                session.setAttribute("TENANT", tenant);
-                session.setAttribute("CLIENT_ID", clientId);
-                log.info("📌 [TenantFilter] Tenant guardado en sesión: {} (Session ID: {})", tenant, session.getId());
-            } else {
-                // ✅ Si no hay client_id, intentar recuperar de la sesión
-                HttpSession session = request.getSession(false);
-                if (session != null) {
-                    String tenantFromSession = (String) session.getAttribute("TENANT");
-                    if (tenantFromSession != null) {
-                        TenantContext.setTenant(tenantFromSession);
-                        log.info("🔄 [TenantFilter] Tenant recuperado de sesión: {}", tenantFromSession);
-                    } else {
-                        log.warn("⚠️ [TenantFilter] No se pudo extraer clientId ni hay tenant en sesión");
+            // Guardar en ThreadLocal
+            TenantContext.setTenant(tenant);
+            TenantContext.setClientId(clientId);
+            
+            // Guardar en sesión
+            HttpSession session = request.getSession(true);
+            session.setAttribute("TENANT", tenant);
+            session.setAttribute("CLIENT_ID", clientId);
+            log.info("📌 [TenantFilter] Tenant {} guardado en sesión: {}", tenant, session.getId());
+        } else {
+            // Si no hay clientId, usar el tenant de la sesión (para /login, /logout, etc.)
+            HttpSession session = request.getSession(false);
+            if (session != null) {
+                String tenantFromSession = (String) session.getAttribute("TENANT");
+                if (tenantFromSession != null) {
+                    TenantContext.setTenant(tenantFromSession);
+                    log.info("🔄 [TenantFilter] Tenant recuperado de sesión: {}", tenantFromSession);
+                    
+                    // También restaurar clientId si está disponible
+                    String clientIdFromSession = (String) session.getAttribute("CLIENT_ID");
+                    if (clientIdFromSession != null) {
+                        TenantContext.setClientId(clientIdFromSession);
                     }
-                } else {
-                    log.warn("⚠️ [TenantFilter] No se pudo extraer clientId y no hay sesión");
                 }
             }
-
+        }
+        
+        try {
             filterChain.doFilter(request, response);
-
         } finally {
-            // No limpiar TenantContext aquí, si queremos que persista para el resto de la request
-            // TenantContext.clear();
+            // Limpiar ThreadLocal al final de la request para evitar leaks
+            TenantContext.clear();
         }
     }
-
+    
     private String extractClientId(HttpServletRequest request) {
-
+        // Primero verificar parámetro
         String clientId = request.getParameter("client_id");
-        if (clientId != null) {
-            log.debug("   Client ID extraído de query parameter: {}", clientId);
+        if (clientId != null && !clientId.isEmpty()) {
             return clientId;
         }
-
+        
+        // Verificar Basic Auth
         String auth = request.getHeader("Authorization");
         if (auth != null && auth.startsWith("Basic ")) {
-            String base64Credentials = auth.substring("Basic ".length());
-            String credentials = new String(Base64.getDecoder().decode(base64Credentials));
-            clientId = credentials.split(":")[0];
-            log.debug("   Client ID extraído de Basic Auth: {}", clientId);
-            return clientId;
+            try {
+                String base64Credentials = auth.substring("Basic ".length());
+                String credentials = new String(Base64.getDecoder().decode(base64Credentials));
+                clientId = credentials.split(":")[0];
+                return clientId;
+            } catch (Exception e) {
+                log.warn("Error decodificando Basic Auth: {}", e.getMessage());
+            }
         }
-
+        
         return null;
     }
 }

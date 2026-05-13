@@ -117,40 +117,40 @@ public class SecurityServerConfig {
 	@Bean
 	@Order(1)
 	public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http, RegisteredClientRepository registeredClientRepository) throws Exception {
-		
-		// Configuración de sesión - FORZAR cookies
+	    
+	    // ✅ MOVER TenantFilter AL PRINCIPIO
+	    http.addFilterBefore(requestLoggingFilter, DisableEncodeUrlFilter.class);
+	    http.addFilterBefore(tenantFilter, DisableEncodeUrlFilter.class);
+	    
+	    // Configuración de sesión - FORZAR cookies
 	    http.sessionManagement(session -> session
 	        .sessionFixation().migrateSession()
 	        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
 	    );
 	    
-	    http.addFilterBefore(requestLoggingFilter, DisableEncodeUrlFilter.class);
-	    
-		http.addFilterBefore(tenantFilter, DisableEncodeUrlFilter.class);
-		
-		OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
-		http.getConfigurer(OAuth2AuthorizationServerConfigurer.class)
-			.clientAuthentication(authentication -> {
-				authentication.authenticationConverter(new PublicClientRefreshTokenAuthenticationConverter());
-				authentication.authenticationProvider(new PublicClientRefreshProvider(registeredClientRepository));
-			})
-			.tokenGenerator(tokenGenerator())
-			.oidc(oidc -> oidc
-				.logoutEndpoint(logout -> logout
-					.logoutResponseHandler((request, response, authentication) -> {
-						handleOidcLogout(request, response, authentication);
-					})));
+	    OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
+	    http.getConfigurer(OAuth2AuthorizationServerConfigurer.class)
+	        .clientAuthentication(authentication -> {
+	            authentication.authenticationConverter(new PublicClientRefreshTokenAuthenticationConverter());
+	            authentication.authenticationProvider(new PublicClientRefreshProvider(registeredClientRepository));
+	        })
+	        .tokenGenerator(tokenGenerator())
+	        .oidc(oidc -> oidc
+	            .logoutEndpoint(logout -> logout
+	                .logoutResponseHandler((request, response, authentication) -> {
+	                    handleOidcLogout(request, response, authentication);
+	                })));
 
-		http.exceptionHandling((exceptions) -> exceptions
-			.defaultAuthenticationEntryPointFor(
-				new LoginUrlAuthenticationEntryPoint("/login"),
-				new MediaTypeRequestMatcher(MediaType.TEXT_HTML)
-			)
-		)
-		.oauth2ResourceServer((resourceServer) -> resourceServer
-				.jwt(Customizer.withDefaults()));
+	    http.exceptionHandling((exceptions) -> exceptions
+	        .defaultAuthenticationEntryPointFor(
+	            new LoginUrlAuthenticationEntryPoint("/login"),
+	            new MediaTypeRequestMatcher(MediaType.TEXT_HTML)
+	        )
+	    )
+	    .oauth2ResourceServer((resourceServer) -> resourceServer
+	            .jwt(Customizer.withDefaults()));
 
-		return http.build();
+	    return http.build();
 	}
 	
 	private void handleOidcLogout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
