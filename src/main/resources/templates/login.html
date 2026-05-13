@@ -7,149 +7,113 @@
 
   <!-- CSS externo -->
   <link rel="stylesheet" th:href="@{/css/login.css}" />
-
-  <!-- Favicon (opcional) -->
-  <!-- <link rel="icon" th:href="@{/images/favicon.ico}" type="image/x-icon" /> -->
 </head>
 <body>
 
 <div class="login-page">
-  <div class="login-card">
+  <!-- Contenedor principal con fondo #E5FAF7 como en React -->
+  <div class="login-container" style="background-color: #E5FAF7;">
+    
+    <!-- Logo - Con animación y posición similar a React -->
+    <div class="logo-wrapper fade-down">
+      <img 
+        th:src="@{/images/feature_logo.png}"
+        src="https://placehold.co/400x100/transparent/transparent?text=Logo"
+        alt="Cobro Móvil Rewards"
+        class="feature-logo"
+      />
+    </div>
 
-    <!-- ══════════════════════════════
-         HERO — Zona superior (mint)
-    ═══════════════════════════════ -->
-    <div class="hero-section">
+    <!-- Hero Person - Con animación de escala similar a React -->
+    <div class="hero-wrapper scale-animation">
+      <img 
+        th:src="@{/images/hero-person.png}"
+        src="https://placehold.co/300x400/transparent/transparent?text=Hero"
+        alt="Cobro Móvil Rewards"
+        class="hero-person"
+      />
+    </div>
 
-      <!-- Logo textual -->
-      <div class="logo-area">
-        <div class="logo-wordmark">
-          <span class="logo-cobro">Cobro</span>
-          <span class="logo-movil">Móvil</span>
-        </div>
-        <span class="logo-rewards">R E W A R D S</span>
-      </div>
-
-      <!-- Alcancía decorativa (top-right) -->
-      <div class="piggy-deco" aria-hidden="true">
-        <div class="piggy-stars">
-          <span class="star-lg">⭐</span>
-          <span class="star-sm">⭐</span>
-          <span class="star-xs">✨</span>
-        </div>
-        <div class="piggy-circle">
-          <div class="piggy-slot"></div>
-        </div>
-      </div>
-
-      <!-- Estrella amarilla de fondo (SVG inline para no depender de imagen) -->
-      <div class="star-shape" aria-hidden="true">
-        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-          <polygon
-            points="100,5 125,75 195,75 140,118 160,190 100,148 40,190 60,118 5,75 75,75"
-            fill="#F5C518"
-          />
-        </svg>
-      </div>
-
-      <!-- Imagen de persona celebrando -->
-      <!--
-        Coloca tu imagen en: src/main/resources/static/images/hero-person.png
-        Thymeleaf resolverá la ruta con th:src="@{/images/hero-person.png}"
-      -->
-      <div class="hero-image-wrap">
-        <img
-          th:src="@{/images/hero-person.png}"
-          src="https://placehold.co/240x340/transparent/transparent?text="
-          alt="Persona celebrando sus recompensas"
+    <!-- Área inferior con SVG de fondo y formulario -->
+    <div class="bottom-area">
+      
+      <!-- Bottom Area SVG de fondo -->
+      <div class="bottom-svg">
+        <img 
+          th:src="@{/images/bottom_area.svg}"
+          src="https://placehold.co/600x400/transparent/transparent?text=SVG"
+          alt=""
+          class="bottom-wave"
         />
       </div>
 
-    </div><!-- /hero-section -->
-
-    <!-- ══════════════════════════════
-         FORMULARIO — Zona inferior (teal)
-    ═══════════════════════════════ -->
-    <div class="form-section">
-
-      <!--
-        Spring Security espera POST a /login por defecto.
-        th:action="@{/login}" genera la URL correcta según el context-path.
-        th:object NO se usa en login; los campos se envían como parámetros planos.
-      -->
-      <form th:action="@{/login}" method="post" autocomplete="off" novalidate>
-
-        <!--
-          Bloque de error:
-          Spring Security redirige a /login?error cuando las credenciales fallan.
-          El parámetro "error" queda disponible en el modelo como param.error.
-        -->
-        <div class="alert-error"
-             th:if="${param.error}"
-             role="alert"
-             aria-live="assertive">
+      <!-- Formulario de login -->
+      <form th:action="@{/login}" method="post" class="login-form fade-up">
+        
+        <!-- Mensajes de error y logout -->
+        <div class="alert-error" th:if="${param.error}" role="alert">
           Correo o contraseña incorrectos. Por favor intenta de nuevo.
         </div>
-
-        <!--
-          Mensaje de logout (opcional):
-          Spring Security redirige a /login?logout tras cerrar sesión.
-        -->
-        <div class="alert-error"
-             th:if="${param.logout}"
-             style="background: rgba(42,191,170,0.18); border-color: rgba(42,191,170,0.5); color: #e0fff9;"
-             role="status"
-             aria-live="polite">
+        
+        <div class="alert-success" th:if="${param.logout}" role="status">
           Has cerrado sesión correctamente.
         </div>
 
-        <!-- Campo: Correo electrónico -->
-        <div class="input-wrap">
-          <input
-            type="email"
-            id="username"
-            name="username"
+        <!-- Campo de correo electrónico -->
+        <div class="input-field">
+          <input 
+            type="email" 
+            id="username" 
+            name="username" 
             placeholder="Correo Electrónico"
+            required
             autocomplete="email"
-            required
-            aria-label="Correo electrónico"
           />
         </div>
 
-        <!-- Campo: Contraseña -->
-        <div class="input-wrap">
-          <input
-            type="password"
-            id="password"
-            name="password"
+        <!-- Campo de contraseña -->
+        <div class="input-field">
+          <input 
+            type="password" 
+            id="password" 
+            name="password" 
             placeholder="Contraseña"
-            autocomplete="current-password"
             required
-            aria-label="Contraseña"
+            autocomplete="current-password"
           />
         </div>
 
-        <!-- Botón de envío -->
-        <button type="submit" class="btn-login">
-          Iniciar sesión
-        </button>
+        <!-- Botón de inicio de sesión -->
+        <div class="button-wrapper">
+          <button type="submit" class="btn-login">
+            Iniciar sesión
+          </button>
+        </div>
 
-        <!-- Links secundarios -->
-        <!-- 
-        <div class="form-links">
-          <a th:href="@{/forgot-password}">¿Olvidaste tu contraseña?</a>
-          <p>
-            ¿No tienes cuenta?
-            <a th:href="@{/register}" class="link-register">Regístrate aquí</a>
+        <!-- Enlaces secundarios (similar a React) 
+        <div class="form-footer">
+          <div class="register-link">
+            ¿No tienes cuenta? 
+            <a th:href="@{/register}" class="register-link-btn">
+              Regístrate aquí
+            </a>
+          </div>
+          <p class="terms-text">
+            Al iniciar sesión, aceptas los 
+            <a href="#" class="terms-link" th:href="@{/terminos-y-condiciones}">
+              Términos y Condiciones
+            </a> 
+            y el 
+            <a href="#" class="terms-link" th:href="@{/aviso-de-privacidad}">
+              Aviso de Privacidad
+            </a>
           </p>
         </div>
-         -->
-
+        -->
       </form>
-    </div><!-- /form-section -->
-
-  </div><!-- /login-card -->
-</div><!-- /login-page -->
+    </div>
+  </div>
+</div>
 
 </body>
 </html>

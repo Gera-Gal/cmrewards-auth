@@ -1,26 +1,23 @@
 /* ============================================
-   Cobro Móvil Rewards — Login Styles
+   Cobro Móvil Rewards — Login Styles (React adaptation)
+   Basado en los estilos del componente Register de React
    ============================================ */
 
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Montserrat:wght@400;600;700;800&display=swap');
 
 /* ── Variables ── */
 :root {
-  --mint-light:   #d6f5ef;
-  --teal-mid:     #2abfaa;
-  --teal-dark:    #0e9e88;
-  --teal-deep:    #0a7c6a;
-  --blue-brand:   #1a6fb5;
-  --blue-dark:    #0d4a8a;
-  --yellow-star:  #f5c518;
-  --gold-star:    #e8a800;
-  --white:        #ffffff;
-  --input-border: #2abfaa;
-  --text-light:   #ffffff;
-  --text-muted:   rgba(255,255,255,0.85);
-  --shadow-card:  0 8px 32px rgba(10, 124, 106, 0.18);
-  --radius-input: 50px;
-  --radius-btn:   50px;
+  --bg-mint: #E5FAF7;
+  --teal-light: #1CABA6;
+  --teal-mid: #2abfaa;
+  --teal-dark: #0e9e88;
+  --blue-gradient-start: #0FB5C9;
+  --blue-gradient-end: #0086B2;
+  --white: #ffffff;
+  --shadow-input: 0 1px 3px rgba(0,0,0,0.1);
+  --shadow-button: 4px 4px 8px -2px rgba(0,0,0,0.6);
+  --radius-input: 0.5rem;
+  --radius-button: 0.5rem;
 }
 
 /* ── Reset & Base ── */
@@ -40,314 +37,316 @@ body {
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  background: linear-gradient(160deg, var(--mint-light) 0%, #b2ede3 100%);
+  background: linear-gradient(160deg, var(--bg-mint) 0%, #d0f0ec 100%);
 }
 
-/* ── Page wrapper ── */
+/* ── Contenedor principal ── */
 .login-page {
   display: flex;
   align-items: center;
   justify-content: center;
   width: 100%;
   min-height: 100vh;
-  padding: 20px;
+  padding: 0;
 }
 
-/* ── Card ── */
-.login-card {
+.login-container {
   position: relative;
   width: 100%;
-  max-width: 420px;
+  max-width: 480px;
+  height: 100vh;
+  max-height: 900px;
+  background-color: var(--bg-mint);
   border-radius: 36px;
   overflow: hidden;
-  background: linear-gradient(
-    180deg,
-    var(--mint-light)  0%,
-    var(--mint-light) 38%,
-    var(--teal-mid)   56%,
-    var(--teal-dark)  72%,
-    var(--teal-deep)  100%
-  );
-  box-shadow: var(--shadow-card);
-  animation: cardEntrance 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+  animation: containerEntrance 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-@keyframes cardEntrance {
-  from { opacity: 0; transform: translateY(28px) scale(0.97); }
-  to   { opacity: 1; transform: translateY(0)    scale(1);    }
+@keyframes containerEntrance {
+  from { opacity: 0; transform: translateY(20px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-/* ── Hero Section (top half) ── */
-.hero-section {
+/* ── Logo Wrapper (igual que en React) ── */
+.logo-wrapper {
   position: relative;
-  padding: 36px 32px 0;
-  min-height: 340px;
+  z-index: 20;
+  padding: 0;
+  margin-top: 2vh;
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+  justify-content: center;
 }
 
-/* ── Logo ── */
-.logo-area {
-  position: relative;
-  z-index: 2;
-  display: flex;
-  flex-direction: column;
-  animation: fadeDown 0.6s 0.15s both;
-}
-
-@keyframes fadeDown {
-  from { opacity: 0; transform: translateY(-16px); }
-  to   { opacity: 1; transform: translateY(0);     }
-}
-
-.logo-wordmark {
-  display: flex;
-  flex-direction: column;
-  line-height: 1;
-}
-
-.logo-cobro {
-  font-family: 'Montserrat', sans-serif;
-  font-size: 2.6rem;
-  font-weight: 800;
-  color: var(--blue-brand);
-  letter-spacing: -1px;
-}
-
-.logo-movil {
-  font-family: 'Montserrat', sans-serif;
-  font-size: 2.6rem;
-  font-weight: 900;
-  color: var(--blue-dark);
-  letter-spacing: -1px;
-  margin-top: -6px;
-}
-
-.logo-rewards {
-  font-family: 'Montserrat', sans-serif;
-  font-size: 0.85rem;
-  font-weight: 700;
-  letter-spacing: 6px;
-  color: var(--teal-dark);
-  margin-top: 4px;
-}
-
-/* ── Piggy coin (top-right decoration) ── */
-.piggy-deco {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  z-index: 3;
-  animation: floatBounce 3.5s ease-in-out infinite;
-}
-
-@keyframes floatBounce {
-  0%, 100% { transform: translateY(0) rotate(-4deg); }
-  50%       { transform: translateY(-8px) rotate(4deg); }
-}
-
-.piggy-circle {
-  width: 88px;
-  height: 88px;
-  background: radial-gradient(circle at 35% 35%, #4ac8f5, #1a6fb5 60%, #0d3d75);
-  border-radius: 50%;
-  position: relative;
-  box-shadow: 0 6px 20px rgba(10, 60, 120, 0.35);
-}
-
-.piggy-slot {
-  position: absolute;
-  top: 28%;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 28px;
-  height: 5px;
-  background: #0a2a55;
-  border-radius: 3px;
-}
-
-.piggy-stars {
-  position: absolute;
-  top: -24px;
-  right: -10px;
-  display: flex;
-  gap: 4px;
-  align-items: flex-end;
-}
-
-.star-lg { font-size: 2.2rem; filter: drop-shadow(0 3px 6px rgba(0,0,0,0.2)); }
-.star-sm { font-size: 1.2rem; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15)); }
-.star-xs { font-size: 0.9rem; }
-
-/* ── Star shape background ── */
-.star-shape {
-  position: absolute;
-  bottom: -20px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 260px;
-  height: 260px;
-  z-index: 1;
-}
-
-.star-shape svg {
-  width: 100%;
-  height: 100%;
-  filter: drop-shadow(0 6px 18px rgba(200, 130, 0, 0.25));
-}
-
-/* ── Hero image (person) ── */
-.hero-image-wrap {
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 240px;
-  z-index: 2;
-  animation: heroRise 0.8s 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-@keyframes heroRise {
-  from { opacity: 0; transform: translateX(-50%) translateY(20px); }
-  to   { opacity: 1; transform: translateX(-50%) translateY(0);    }
-}
-
-.hero-image-wrap img {
-  width: 100%;
+.feature-logo {
+  height: 20vh;
+  width: auto;
+  object-fit: contain;
   display: block;
+}
+
+/* ── Hero Person Wrapper (igual que en React) ── */
+.hero-wrapper {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  justify-content: center;
+  margin-top: 11vh;
+  padding: 0 0 0 2rem;
+  pointer-events: none;
+}
+
+.hero-person {
+  max-height: 55vh;
+  width: auto;
   object-fit: contain;
 }
 
-/* ── Wave divider ── */
-.wave-divider {
-  display: block;
-  width: 100%;
-  margin-top: -2px;
-  line-height: 0;
+/* ── Bottom Area (fijo abajo) ── */
+.bottom-area {
+  position: absolute;
+  bottom: -2vh;
+  left: 0;
+  right: 0;
+  z-index: 1;
 }
 
-/* ── Form Section (bottom half) ── */
-.form-section {
-  background: linear-gradient(180deg, var(--teal-mid) 0%, var(--teal-deep) 100%);
-  padding: 28px 28px 36px;
+/* SVG de fondo */
+.bottom-svg {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.bottom-wave {
+  width: 100%;
+  height: 60vh;
+  object-fit: cover;
+  object-position: top center;
+  display: block;
+}
+
+/* ── Formulario (posicionado sobre el SVG) ── */
+.login-form {
+  position: relative;
+  z-index: 20;
+  width: 100%;
+  max-width: 24rem;
+  margin: 0 auto;
+  padding: 0 2rem;
+  margin-bottom: 10vh;
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  animation: fadeUp 0.6s 0.4s both;
+  gap: 0.75rem;
 }
 
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(18px); }
-  to   { opacity: 1; transform: translateY(0);    }
-}
-
-/* ── Error alert ── */
-.alert-error {
-  background: rgba(255, 80, 80, 0.18);
-  border: 1px solid rgba(255, 120, 120, 0.5);
-  border-radius: 14px;
-  padding: 10px 16px;
-  color: #ffe0e0;
-  font-size: 0.85rem;
-  font-weight: 600;
-  text-align: center;
-}
-
-/* ── Input wrapper ── */
-.input-wrap {
-  position: relative;
-}
-
-.input-wrap input {
+/* ── Campos de input (igual que en React) ── */
+.input-field {
   width: 100%;
-  padding: 15px 22px;
+}
+
+.input-field input {
+  width: 100%;
+  height: 2.25rem; /* h-9 en Tailwind = 36px */
+  background-color: var(--white);
+  border: 0;
+  padding: 0 1.25rem;
+  font-size: 1.2rem;
   border-radius: var(--radius-input);
-  border: 2px solid transparent;
-  background: var(--white);
+  box-shadow: var(--shadow-input);
   font-family: 'Nunito', sans-serif;
-  font-size: 1rem;
   font-weight: 600;
-  color: var(--teal-dark);
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.input-field input::placeholder {
+  color: var(--teal-light);
+  font-weight: 600;
+  opacity: 0.8;
+}
+
+.input-field input:focus {
   outline: none;
-  transition: border-color 0.25s, box-shadow 0.25s;
+  box-shadow: 0 0 0 3px rgba(28, 171, 166, 0.2);
+  transform: scale(1.01);
 }
 
-.input-wrap input::placeholder {
-  color: var(--teal-mid);
-  font-weight: 600;
+/* ── Botón de login (igual que en React) ── */
+.button-wrapper {
+  display: flex;
+  justify-content: center;
+  padding-top: 0.5rem;
+  padding-bottom: 1rem;
 }
 
-.input-wrap input:focus {
-  border-color: var(--blue-brand);
-  box-shadow: 0 0 0 4px rgba(26, 111, 181, 0.15);
-}
-
-/* ── Submit button ── */
 .btn-login {
-  width: 100%;
-  padding: 16px;
-  border-radius: var(--radius-btn);
+  height: 2.25rem;
+  padding: 0 3rem;
+  background: linear-gradient(180deg, #0FB5C9 0%, #0086B2 100%);
   border: none;
-  cursor: pointer;
-  font-family: 'Nunito', sans-serif;
-  font-size: 1.05rem;
-  font-weight: 800;
-  letter-spacing: 0.3px;
+  border-radius: var(--radius-button);
+  box-shadow: var(--shadow-button);
   color: var(--white);
-  background: linear-gradient(135deg, #2283d6 0%, #1a6fb5 50%, #1259a0 100%);
-  box-shadow: 0 6px 20px rgba(13, 74, 138, 0.4), inset 0 1px 0 rgba(255,255,255,0.2);
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
   transition: transform 0.18s, box-shadow 0.18s, filter 0.18s;
-  margin-top: 4px;
+  min-width: 180px;
 }
 
 .btn-login:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 28px rgba(13, 74, 138, 0.5), inset 0 1px 0 rgba(255,255,255,0.25);
-  filter: brightness(1.08);
+  box-shadow: 6px 6px 12px -2px rgba(0,0,0,0.6);
+  filter: brightness(1.05);
 }
 
 .btn-login:active {
   transform: translateY(0);
-  box-shadow: 0 4px 12px rgba(13, 74, 138, 0.35);
+  box-shadow: 2px 2px 6px -2px rgba(0,0,0,0.6);
 }
 
-/* ── Footer links ── */
-.form-links {
+/* ── Alertas ── */
+.alert-error {
+  background: rgba(220, 53, 69, 0.15);
+  border: 1px solid rgba(220, 53, 69, 0.5);
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+  color: #dc3545;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-align: center;
+  backdrop-filter: blur(4px);
+}
+
+.alert-success {
+  background: rgba(40, 167, 69, 0.15);
+  border: 1px solid rgba(40, 167, 69, 0.5);
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+  color: #28a745;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-align: center;
+  backdrop-filter: blur(4px);
+}
+
+/* ── Footer del formulario (similar a React) ── */
+.form-footer {
+  text-align: center;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  margin-top: 6px;
+  gap: 0.25rem;
+  padding-top: 0.5rem;
 }
 
-.form-links a,
-.form-links p {
-  font-family: 'Nunito', sans-serif;
-  font-size: 0.88rem;
-  color: var(--text-muted);
-  text-decoration: none;
-  text-align: center;
-  transition: color 0.2s;
+.register-link {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.95);
+  font-weight: 500;
 }
 
-.form-links a:hover { color: var(--white); }
-
-.form-links .link-register {
+.register-link-btn {
   font-weight: 700;
-  color: var(--white);
-  text-decoration: underline;
-  text-underline-offset: 2px;
+  color: white;
+  text-decoration: none;
+  transition: text-decoration 0.2s;
 }
 
-.form-links .link-register:hover { color: var(--yellow-star); }
+.register-link-btn:hover {
+  text-decoration: underline;
+}
+
+.terms-text {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.4;
+  font-weight: 400;
+  margin-top: 0.25rem;
+}
+
+.terms-link {
+  font-weight: 700;
+  color: white;
+  text-decoration: none;
+  transition: text-decoration 0.2s;
+}
+
+.terms-link:hover {
+  text-decoration: underline;
+}
+
+/* ── Animaciones (igual que en React con Framer Motion) ── */
+@keyframes fadeDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scaleAnimation {
+  0% { opacity: 0; transform: scale(1.6); }
+  100% { opacity: 1; transform: scale(1.7); }
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.fade-down {
+  animation: fadeDown 0.6s ease-out both;
+}
+
+.scale-animation {
+  animation: scaleAnimation 0.7s 0.1s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.fade-up {
+  animation: fadeUp 0.6s 0.2s ease-out both;
+}
 
 /* ── Responsive ── */
-@media (max-width: 440px) {
-  .login-card       { border-radius: 0; min-height: 100vh; max-width: 100%; }
-  .login-page       { padding: 0; }
-  .logo-cobro,
-  .logo-movil       { font-size: 2.2rem; }
-  .hero-image-wrap  { width: 200px; }
-  .star-shape       { width: 220px; height: 220px; }
+@media (max-width: 480px) {
+  .login-container {
+    border-radius: 0;
+    max-width: 100%;
+  }
+  
+  .feature-logo {
+    height: 20vh;
+  }
+  
+  .hero-person {
+    max-height: 55vh;
+  }
+  
+  .login-form {
+    padding: 0 1.5rem;
+  }
+  
+  .input-field input {
+    font-size: 1rem;
+    height: 2rem;
+  }
+  
+  .btn-login {
+    padding: 0 2rem;
+    min-width: 150px;
+  }
+}
+
+@media (max-width: 380px) {
+  .feature-logo {
+    height: 20vh;
+  }
+  
+  .hero-person {
+    max-height: 55vh;
+  }
+  
+  .login-form {
+    padding: 0 1rem;
+  }
 }
