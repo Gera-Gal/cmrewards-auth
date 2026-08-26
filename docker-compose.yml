@@ -6,10 +6,10 @@ services:
     container_name: cmr-auth
     restart: always
     ports:
-      - "5505:5505"
+      - "9000:9000"
     networks:
-      - proxy-network
+      - shared-network
       
 networks:
-  proxy-network:
+  shared-network:
     external: true
